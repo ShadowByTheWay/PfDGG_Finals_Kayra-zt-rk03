@@ -1,0 +1,67 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TheFinals
+{
+    internal class DeliverySystem
+    {
+        private Player player;
+        private Order order;
+        public DeliverySystem(Player player, Order order)
+        {
+            this.player = player;
+            this.order = order;
+        }
+        public static void TryDeliver(Player player, Order order)
+        {
+            if (player.placeNames[player.placeNameIndex] != order.from) //check if request is valid or if bro is not paying attention xdd
+            {
+                Console.WriteLine("You are not at the pick up place.");
+                return;
+            }
+
+            if (order.completed)
+            {
+                Console.WriteLine("This order has already been completed."); //same
+            }
+
+            player.energy -= 1;
+            player.day += 1;
+            player.sanity -= 1;
+
+            for (int i = 0; i < player.placeNames.Length; i++)
+            {
+                if (player.placeNames[i] == order.from)
+                {
+                    player.placeNameIndex = i;
+                    break; //if you don't break here the system legit crashes because placeNameIndex isn't what you ordered it to be so 2 things collide and the system blows up
+                }
+            }
+
+            // Payment section
+            if (player.day <= order.deadline)
+            {
+                player.money += order.pay;
+                player.reputation += 1;
+            }
+            else 
+            {
+                player.money += order.pay / 2; //reputation doesn't increase when you are a big monkey and forget to deliver in time and you get half the pay lulz.
+            }
+            order.completed = true;
+            for (int i = 0; i < player.placeNames.Length; i++)
+            {
+                if (player.placeNames[i] == order.to)
+                {
+                    player.placeNameIndex = i;
+                    break;
+                }
+            }
+            Console.WriteLine("You arrived at " + order.to + ".");
+            Console.WriteLine("Delivery complete!");
+        }
+    }
+}
